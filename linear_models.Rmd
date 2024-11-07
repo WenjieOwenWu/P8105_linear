@@ -1,0 +1,36 @@
+---
+title: "linear_models"
+author: "Wenjie Wu"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(p8105.datasets)
+library(broom)
+library(dplyr)
+```
+
+```{r}
+data("nyc_airbnb")
+
+nyc_airbnb = 
+  nyc_airbnb |> 
+  mutate(stars = review_scores_location / 2) |> 
+  rename(
+    borough = neighbourhood_group,
+    neighborhood = neighbourhood) |> 
+  filter(borough != "Staten Island") |> 
+  select(price, stars, borough, neighborhood, room_type)
+```
+
+
+```{r}
+fit = lm(price ~ stars, data = nyc_airbnb)
+
+summary(fit)
+
+coef(fit)
+
+broom::tidy(fit)
+```
+
