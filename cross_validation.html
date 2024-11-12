@@ -409,6 +409,39 @@ wiggly_mod = gam(logratio ~ s(range, k = 30), sp = 10e-6, data = train_df)</code
 </div>
 <div id="repeat-the-train-test-split" class="section level2">
 <h2>Repeat the train / test split</h2>
+<pre class="r"><code>cv_df = 
+  crossv_mc(lidar_df, 100) |&gt;
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble)
+  )</code></pre>
+<pre class="r"><code>cv_df |&gt;
+  pull(train) |&gt;
+  nth(3) |&gt;
+  as_tibble()</code></pre>
+<pre><code>## # A tibble: 176 × 3
+##    range logratio    id
+##    &lt;int&gt;    &lt;dbl&gt; &lt;int&gt;
+##  1   390  -0.0504     1
+##  2   391  -0.0601     2
+##  3   393  -0.0419     3
+##  4   394  -0.0510     4
+##  5   396  -0.0599     5
+##  6   399  -0.0596     7
+##  7   400  -0.0399     8
+##  8   402  -0.0294     9
+##  9   403  -0.0395    10
+## 10   405  -0.0476    11
+## # ℹ 166 more rows</code></pre>
+<p>Fit models, extract RMSEs</p>
+<pre class="r"><code>cv_res_df = 
+  cv_df |&gt;
+  mutate(
+    linear_mod = map(train, \(x) lm(logratio ~ range, data = x))
+  ) |&gt;
+  mutate(
+    rmse_linear = map2(linear_mod, test, rmse)
+  )</code></pre>
 </div>
 
 
